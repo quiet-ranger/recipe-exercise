@@ -1,23 +1,19 @@
 package com.example.sfgrecipe.model;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-public class Ingredient {
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String description;
-    private BigDecimal amount;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    private UnitOfMeasure uom;
-
-    @ManyToOne
-    private Recipe recipe;
+    @ManyToMany(mappedBy = "categories")
+    private Set<Recipe> recipes = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -35,19 +31,11 @@ public class Ingredient {
         this.description = description;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public Set<Recipe> getRecipes() {
+        return recipes;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public Recipe getRecipe() {
-        return recipe;
-    }
-
-    public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
+    public void setRecipes(Set<Recipe> recipes) {
+        this.recipes = recipes;
     }
 }

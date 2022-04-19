@@ -8,7 +8,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import org.springframework.jdbc.support.incrementer.HanaSequenceMaxValueIncrementer;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
 import java.util.HashSet;
@@ -16,6 +18,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class IndexControllerTest {
 
@@ -28,6 +32,25 @@ class IndexControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         indexController = new IndexController(recipeService);
+    }
+
+    @Test
+    public void testMockMVC() throws Exception {
+
+        // The second option, MockMvcBuilders.webAppContext(), creates a much heavier object that is more
+        // suitable for integration tests
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(indexController).build();
+
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+//                .andExpect(header().stringValues("Content-Type","text/html"))
+//                .andExpect(header().stringValues("Content-Type", "charset=UTF-8"))
+                ;
+
+//        MvcResult mvcResult = mockMvc.perform(get("/")).andReturn();
+//        String headerValue = mvcResult.getResponse().getHeader("Content-Type");
+//        assertEquals("text/html;charset=UTF-8", headerValue);
     }
 
     @Test

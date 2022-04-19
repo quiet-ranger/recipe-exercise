@@ -33,6 +33,6 @@ class IndexControllerTest {
         verify(recipeService, times(1)).getRecipes();
 
         // check that model.addAttribute( "recipes", <any_Set_instance> ) was called just once
-        verify(model, times(1)).addAttribute("recipes", anySet());
+        verify(model, times(1)).addAttribute( eq("recipes"), anySet());
     }
 }

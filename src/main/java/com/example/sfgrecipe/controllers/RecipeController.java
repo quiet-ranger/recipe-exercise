@@ -20,7 +20,7 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @RequestMapping("/recipe/show/{id}")
+    @RequestMapping("/recipe/{id}")
     public String showById(@PathVariable String id, Model model){
         model.addAttribute("recipe", recipeService.findById(Long.valueOf(id)));
         return "recipe/show";
@@ -29,6 +29,13 @@ public class RecipeController {
     @RequestMapping("recipe/new")
     public String newRecipe(Model model) {
         model.addAttribute("recipe", new RecipeViewModel());
+        return "recipe/recipeform";
+    }
+
+    @RequestMapping("recipe/{id}/update")
+    public String requestRecipeUpdate(@PathVariable String id, Model model) {
+        assert(id != null);
+        model.addAttribute("recipe", RecipeViewModel.fromRecipe(recipeService.findById(Long.valueOf(id))));
         return "recipe/recipeform";
     }
 
@@ -41,6 +48,6 @@ public class RecipeController {
             log.error("Failed to update or create new recipe");
             return "error";
         }
-        return "redirect:/recipe/show/" + RecipeViewModel.fromRecipe(savedRecipe).getId();
+        return "redirect:/recipe/" + RecipeViewModel.fromRecipe(savedRecipe).getId();
     }
 }

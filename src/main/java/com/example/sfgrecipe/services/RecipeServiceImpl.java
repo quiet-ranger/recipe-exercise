@@ -30,4 +30,10 @@ public class RecipeServiceImpl implements RecipeService {
     public Recipe findById(Long l) {
         return recipeRepository.findById(l).orElse(null);
     }
+
+    @Override
+    public Recipe upsert(Recipe entity) {
+        return recipeRepository.save(entity);
+    }
+
 }

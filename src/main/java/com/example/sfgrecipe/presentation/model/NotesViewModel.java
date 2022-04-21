@@ -12,13 +12,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NotesViewModel {
     private Long id;
-    private String description;
+    private String recipeNotes;
 
     public static Notes toNotes(NotesViewModel source) {
         if (source == null) return null;
         Notes notes = new Notes();
         notes.setId(source.getId());
-        notes.setRecipeNotes(source.getDescription());
+        notes.setRecipeNotes(source.getRecipeNotes());
         return notes;
     }
 

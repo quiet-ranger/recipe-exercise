@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Controller
 @Slf4j
@@ -20,19 +19,19 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @RequestMapping("/recipe/{id}")
+    @GetMapping("/recipe/{id}")
     public String showById(@PathVariable String id, Model model){
         model.addAttribute("recipe", recipeService.findById(Long.valueOf(id)));
         return "recipe/show";
     }
 
-    @RequestMapping("recipe/new")
+    @GetMapping("recipe/new")
     public String newRecipe(Model model) {
         model.addAttribute("recipe", new RecipeViewModel());
         return "recipe/recipeform";
     }
 
-    @RequestMapping("recipe/{id}/update")
+    @GetMapping("recipe/{id}/update")
     public String requestRecipeUpdate(@PathVariable String id, Model model) {
         assert(id != null);
         model.addAttribute("recipe", RecipeViewModel.fromRecipe(recipeService.findById(Long.valueOf(id))));
@@ -40,8 +39,7 @@ public class RecipeController {
     }
 
 //    @RequestMapping(name = "recipe", method = POST) This is the older way of doing things
-    @PostMapping
-    @RequestMapping("recipe")
+    @PostMapping("recipe")
     public String saveOrUpdate(@ModelAttribute RecipeViewModel command) {
         Recipe savedRecipe = recipeService.upsert(RecipeViewModel.toRecipe(command));
         if (savedRecipe == null) {
@@ -49,5 +47,18 @@ public class RecipeController {
             return "error";
         }
         return "redirect:/recipe/" + RecipeViewModel.fromRecipe(savedRecipe).getId();
+    }
+
+    @DeleteMapping("recipe/{id}")
+    public String deleteRecipe(@PathVariable String id, Model model) {
+        recipeService.deleteById(Long.valueOf(id));
+        return "redirect:/";
+    }
+
+    // Unfortunately, HTML5 forms support only two methods, GET and POST, therefore
+    // a deletion needs to be provided via this non RESTful compliant mechanism
+    @GetMapping("recipe/{id}/delete")
+    public String deleteRecipeFromForm(@PathVariable String id, Model model) {
+        return this.deleteRecipe(id, model);
     }
 }

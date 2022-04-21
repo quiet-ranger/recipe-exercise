@@ -6,9 +6,11 @@ import java.util.Set;
 
 public interface RecipeService {
 
-    public Set<Recipe> getRecipes();
+    Set<Recipe> getRecipes();
 
-    public Recipe findById(Long l);
+    Recipe findById(Long l);
 
-    public Recipe upsert(Recipe entity);
+    Recipe upsert(Recipe entity);
+
+    void deleteById(Long id);
 }

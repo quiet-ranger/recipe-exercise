@@ -11,10 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class RecipeControllerTest {
@@ -68,7 +66,7 @@ class RecipeControllerTest {
 //                  .param("description", "some string")
             )
             .andExpect(status().is3xxRedirection())
-            .andExpect(view().name("redirect:/recipe/show/2"));
+            .andExpect(view().name("redirect:/recipe/2"));
     }
 
     @Test // GET /recipe/2/update
@@ -83,4 +81,23 @@ class RecipeControllerTest {
                 .andExpect(view().name("recipe/recipeform"))
                 .andExpect(model().attributeExists("recipe"));
     }
+
+    @Test // DELETE using RESTful standard
+    public void deletingByIdFromRESTclient() throws Exception {
+        mockMvc.perform(delete("/recipe/1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/"))
+                ;
+        verify(recipeService, times(1)).deleteById(anyLong());
+    }
+
+    @Test // GET workaround to achieve deletion from forms
+    public void deletingByIdFromHTML5Form() throws Exception {
+        mockMvc.perform(get("/recipe/1/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/"))
+        ;
+        verify(recipeService, times(1)).deleteById(anyLong());
+    }
+
 }

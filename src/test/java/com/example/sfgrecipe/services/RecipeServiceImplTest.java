@@ -28,7 +28,7 @@ class RecipeServiceImplTest {
     }
 
     @Test
-    public void getRecipeByIdTest() throws Exception {
+    public void findByIdWorksWithValidId() throws Exception {
         Recipe recipe = new Recipe();
         recipe.setId(1L);
         Optional<Recipe> recipeOptional = Optional.of(recipe);
@@ -43,7 +43,7 @@ class RecipeServiceImplTest {
     }
 
     @Test
-    void getRecipes() {
+    void findAllWorks() {
         Recipe recipe = new Recipe();
         HashSet<Recipe> result = new HashSet<>();
         result.add(recipe);
@@ -54,4 +54,14 @@ class RecipeServiceImplTest {
         assertEquals(recipes.size(), 1);
         verify(recipeRepository, times(1)).findAll();
     }
+
+    @Test
+    public void deletingNonExistingIdHasNoSideEffect() {
+        Long idToDelete = Long.MAX_VALUE;
+
+        recipeService.deleteById(idToDelete);
+
+        verify(recipeRepository, times(1)).deleteById(anyLong());
+    }
+
 }

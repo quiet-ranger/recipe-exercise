@@ -1,8 +1,9 @@
 package com.example.sfgrecipe.controllers;
 
 import com.example.sfgrecipe.model.Recipe;
-import com.example.sfgrecipe.presentation.model.RecipeViewModel;
+import com.example.sfgrecipe.services.IngredientService;
 import com.example.sfgrecipe.services.RecipeService;
+import com.example.sfgrecipe.services.UnitOfMeasureService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,6 +21,12 @@ class IngredientControllerTest {
     @Mock
     RecipeService recipeService;
 
+    @Mock
+    IngredientService ingredientService;
+
+    @Mock
+    UnitOfMeasureService unitOfMeasureService;
+
     IngredientController controller;
 
     MockMvc mockMvc;
@@ -27,7 +34,7 @@ class IngredientControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new IngredientController(recipeService);
+        controller = new IngredientController(recipeService, ingredientService, unitOfMeasureService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 

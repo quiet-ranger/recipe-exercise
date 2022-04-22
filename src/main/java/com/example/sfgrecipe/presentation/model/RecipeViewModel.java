@@ -44,7 +44,7 @@ public class RecipeViewModel {
 
         recipe.setIngredients(
                 source.getIngredients().stream()
-                        .map(ingredient -> IngredientViewModel.toIngredient(ingredient))
+                        .map(ingredient -> IngredientViewModel.toIngredient(ingredient, recipe))
                         .collect(Collectors.toSet())
         );
 

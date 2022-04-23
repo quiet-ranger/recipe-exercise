@@ -38,7 +38,6 @@ public class RecipeController {
         return "recipe/recipeform";
     }
 
-//    @RequestMapping(name = "recipe", method = POST) This is the older way of doing things
     @PostMapping("recipe")
     public String saveOrUpdate(@ModelAttribute RecipeViewModel command) {
         Recipe savedRecipe = recipeService.upsert(RecipeViewModel.toRecipe(command));

@@ -36,12 +36,12 @@ public class IngredientController {
         this.unitOfMeasureService = unitOfMeasureService;
     }
 
-    @GetMapping("/recipe/{recipeId}/ingredient")
-    public String listIngredients(@PathVariable String recipeId, Model model) {
-        log.info("listIngredients end point invoked");
-        model.addAttribute("recipe", recipeService.findById(Long.valueOf(recipeId)));
-        return "ingredient/list";
-    }
+//    @GetMapping("/recipe/{recipeId}/ingredient")
+//    public String listIngredients(@PathVariable String recipeId, Model model) {
+//        log.info("listIngredients end point invoked");
+//        model.addAttribute("recipe", recipeService.findById(Long.valueOf(recipeId)));
+//        return "ingredient/list";
+//    }
 
     @GetMapping("/recipe/{recipeId}/ingredient/{ingredientId}/update")
     public String updateRecipeIngredientRequest(
@@ -61,18 +61,41 @@ public class IngredientController {
         return "ingredient/ingredientform";
     }
 
+    @GetMapping("/recipe/{recipeId}/ingredient/new")
+    public String addRecipeIngredientRequest(@PathVariable String recipeId, Model model) {
+        IngredientViewModel ingredientViewModel = new IngredientViewModel();
+        ingredientViewModel.setRecipeId(Long.valueOf(recipeId));
+        model.addAttribute("ingredient", ingredientViewModel);
+        Set<UnitOfMeasureViewModel> uomList = new HashSet<>();
+        unitOfMeasureService.listAllUnitsOfMeasure().forEach(
+                (element) -> {
+                    uomList.add(UnitOfMeasureViewModel.fromUnitOfMeasure(element));
+                }
+        );
+        model.addAttribute("uomList", uomList);
+        return "ingredient/ingredientform";
+    }
+
     @PostMapping("/recipe/{recipeId}/ingredient/{ingredientId}")
-    public String updateRecipeIngredient(@ModelAttribute IngredientViewModel command) {
+    public String insertOrUpdateIngredientToRecipe(@ModelAttribute IngredientViewModel command) {
         Recipe recipe = recipeService.findById(command.getRecipeId());
         assert( recipe != null );
         Ingredient ingredient = IngredientViewModel.toIngredient(command, recipe);
         ingredient.setUom(UnitOfMeasureViewModel.toUnitOfMeasure(command.getUnitOfMeasure()));
 
-        Ingredient savedIngredient = ingredientService.upsert(ingredient);
-
-        if (savedIngredient == null) {
-            log.error("Failed to update or create new ingredient");
-            return "error";
+        if (command.getId() == null) {
+            // we are dealing with a new Ingredient that did not exist before
+            recipe.addIngredient(ingredient);
+            // saving the recipe will cause all ingredients, including new ones to be persisted
+            recipeService.upsert(recipe);
+        }
+        else {
+            // This is just an update, so we must persist the new values for the ingredient
+            Ingredient savedIngredient = ingredientService.upsert(ingredient);
+            if (savedIngredient == null) {
+                log.error("Failed to update or create new ingredient");
+                return "error";
+            }
         }
         return "redirect:/recipe/" + command.getRecipeId();
     }

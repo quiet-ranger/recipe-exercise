@@ -89,9 +89,6 @@
               <div class="col-md-11 ">
                 <h1 class="panel-title">Ingredients</h1>
               </div>
-              <div class="col-md-1">
-                <a class="btn btn-default" href="#" th:href="@{'/recipe/' + ${recipe.id} + '/ingredient/new'}" role="button">Add Ingredient</a>
-              </div>
             </div>
           </div>
           <div class="panel-body">
@@ -99,26 +96,26 @@
               <table class="table table-hover">
                 <thead class="thead-inverse">
                 <tr>
-                  <th>Description</th>
-                  <th>Update</th>
-                  <th>Delete</th>
+                  <th>Amount</th>
+                  <th>Unit of Measure</th>
+                  <th>Ingredient</th>
                 </tr>
                 </thead>
                 <tr th:remove="all">
-                  <td>Tasty Goodnees 1</td>
-                  <td><a href="#">Update</a></td>
-                  <td><a href="#">Delete</a></td>
+                  <td>1</td>
+                  <td>Cup</td>
+                  <td>Sugar</td>
                 </tr>
                 <tr th:remove="all">
-                  <td>Tasty Goodnees 2</td>
-                  <td><a href="#">Update</a></td>
-                  <td><a href="#">Delete</a></td>
+                  <td>2</td>
+                  <td>Liters</td>
+                  <td>Milk</td>
                 </tr>
                 <!--/*@thymesVar id="ingredient" type="com.example.sfgrecipe.presentation.model.IngredientViewModel"*/-->
                 <tr th:each="ingredient : ${recipe.ingredients}">
-                  <td th:text="${ingredient.amount} + ' ' + ${ingredient.unitOfMeasure.description} + ' ' + ${ingredient.description}">Tasty Goodnees 3</td>
-                  <td><a href="#" th:href="@{'/recipe/' + ${recipe.id} + '/ingredient/' + ${ingredient.id} + '/update'}">Update</a></td>
-                  <td><a href="#" th:href="@{'/recipe/' + ${recipe.id} + '/ingredient/' + ${ingredient.id} + '/delete'}">Delete</a></td>
+                  <td th:text="${ingredient.amount}">One</td>
+                  <td th:text="${ingredient.unitOfMeasure.description}">Pinch</td>
+                  <td th:text="${ingredient.description}">Salt</td>
                 </tr>
               </table>
             </div>

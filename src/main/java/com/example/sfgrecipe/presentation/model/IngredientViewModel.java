@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @NoArgsConstructor
 public class IngredientViewModel {
-    private Long id;
+    private Long id = null;
     private Long recipeId;
     private String description;
     private BigDecimal amount;

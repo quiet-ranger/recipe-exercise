@@ -1,18 +1,22 @@
 package com.example.sfgrecipe.controllers;
 
+import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.services.ImageService;
+import com.example.sfgrecipe.services.RecipeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -21,6 +25,9 @@ class ImageControllerTest {
     @Mock
     ImageService imageService;
 
+    @Mock
+    RecipeService recipeService;
+
     ImageController controller;
 
     MockMvc mockMvc;
@@ -28,7 +35,7 @@ class ImageControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new ImageController(imageService);
+        controller = new ImageController(imageService, recipeService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -49,5 +56,30 @@ class ImageControllerTest {
                 ;
 
         verify(imageService, times(1)).saveImageFile(anyLong(),any());
+    }
+
+    @Test
+    public void handleImageRetrieval() throws Exception {
+
+        String s = "Simulated image content";
+        Byte[] simulatedImage = new Byte[s.getBytes(StandardCharsets.UTF_8).length];
+        int index = 0;
+        for (byte b : s.getBytes(StandardCharsets.UTF_8)) {
+            simulatedImage[index++] = b;
+        }
+
+        Recipe recipe = new Recipe();
+        recipe.setId(1L);
+        recipe.setImage( simulatedImage );
+
+        when(recipeService.findById(anyLong())).thenReturn(recipe);
+
+        MockHttpServletResponse response = mockMvc.perform(get("/recipe/1/recipeimage"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse()
+                ;
+        byte[] responseBytes = response.getContentAsByteArray();
+
+        assertEquals(s.getBytes(StandardCharsets.UTF_8).length, responseBytes.length);
     }
 }

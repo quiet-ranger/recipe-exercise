@@ -14,7 +14,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     private final RecipeRepository recipeRepository;
 
-    public RecipeServiceImpl(RecipeRepository recipeRepository) {
+    public RecipeServiceImpl(com.example.sfgrecipe.repositories.RecipeRepository recipeRepository) {
         this.recipeRepository = recipeRepository;
     }
 

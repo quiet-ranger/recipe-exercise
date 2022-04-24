@@ -1,6 +1,7 @@
 package com.example.sfgrecipe.services;
 
 import com.example.sfgrecipe.model.Recipe;
+import com.example.sfgrecipe.repositories.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,24 +13,30 @@ import java.util.stream.IntStream;
 @Service
 public class ImageServiceImpl implements ImageService {
 
-    private final RecipeService recipeService;
+    private final RecipeRepository recipeRepository;
 
-    public ImageServiceImpl(RecipeService recipeService) {
-        this.recipeService = recipeService;
+    public ImageServiceImpl(RecipeRepository recipeRepository) {
+        this.recipeRepository = recipeRepository;
     }
 
     @Override
     public void saveImageFile(Long recipeId, MultipartFile file) {
-        Recipe recipe = recipeService.findById(recipeId);
-        try {
-            byte[] image = file.getBytes();
-            recipe.setImage(IntStream.range(0, image.length)
-                    .mapToObj(i -> image[i])
-                    .toArray(Byte[]::new));
-        } catch (IOException e) {
-            log.error("This condition needs to be handled more gracefully");
+        Recipe recipe = recipeRepository.findById(recipeId).orElse(null);
+        if ( recipe != null ) {
+            try {
+                byte[] imageBytes = file.getBytes();
+                Byte[] image = IntStream
+                        .range(0, imageBytes.length)
+                        .mapToObj(i -> imageBytes[i])
+                        .toArray(Byte[]::new);
+                recipe.setImage(image);
+                recipeRepository.save(recipe);
+            } catch (IOException e) {
+                log.error("This condition needs to be handled more gracefully");
+            }
         }
-        recipeService.upsert(recipe);
-        return;
+        else {
+            log.error("Non-existent recipe condition needs to be dealt with");
+        }
     }
 }

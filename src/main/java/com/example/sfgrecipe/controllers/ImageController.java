@@ -1,7 +1,10 @@
 package com.example.sfgrecipe.controllers;
 
+import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.presentation.model.RecipeViewModel;
 import com.example.sfgrecipe.services.ImageService;
+import com.example.sfgrecipe.services.RecipeService;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,13 +13,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 @Controller
 public class ImageController {
 
     private final ImageService imageService;
+    private final RecipeService recipeService;
 
-    public ImageController(ImageService imageService) {
+    public ImageController(ImageService imageService, RecipeService recipeService) {
         this.imageService = imageService;
+        this.recipeService = recipeService;
     }
 
     @GetMapping("/recipe/{recipeId}/image")
@@ -32,5 +41,22 @@ public class ImageController {
     public String handleImagePost(@PathVariable String recipeId, @RequestParam("imagefile") MultipartFile file) {
         imageService.saveImageFile(Long.valueOf(recipeId), file);
         return String.format( "redirect:/recipe/%s", recipeId);
+    }
+
+    @GetMapping("recipe/{recipeId}/recipeimage")
+    public void handleRetrieveImage(@PathVariable String recipeId, HttpServletResponse response) throws Exception {
+        Recipe recipe = recipeService.findById(Long.valueOf(recipeId));
+
+        byte[] image = new byte[0];
+        if ( recipe.getImage() != null ) {
+          image = new byte[recipe.getImage().length];
+          int i = 0;
+          for (Byte b : recipe.getImage() ) {
+              image[i++] = b;
+          }
+        }
+        response.setContentType("image/jpeg");
+        InputStream is = new ByteArrayInputStream(image);
+        IOUtils.copy(is, response.getOutputStream());
     }
 }

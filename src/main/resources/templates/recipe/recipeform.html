@@ -37,7 +37,7 @@
                                 <div class="col-lg-3 form-group">
                                     <img src="../../static/images/Handover.jpg" width="164" height="164"
                                          class="bar-sm main-image"
-                                         th:src="@{/images/Handover.jpg}">
+                                         th:src="@{'/recipe/' + ${recipe.id} + '/recipeimage'}">
                                     <a class="btn btn-default" href="#" th:href="@{'/recipe/' + ${recipe.id} + '/image'}" role="button">Change Image</a>
                                 </div>
                             </div>

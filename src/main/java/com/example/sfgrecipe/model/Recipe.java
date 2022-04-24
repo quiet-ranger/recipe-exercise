@@ -31,7 +31,7 @@ public class Recipe {
     private Set<Ingredient> ingredients = new HashSet<>();
 
     @Lob
-    private Byte[] image;
+    private Byte[] image; // Modelled as an array of the boxed objects as a Hibernate recommendation
 
     // If recipe is deleted, so will the notes attached to it. But the reverse is not true
     @OneToOne(cascade = CascadeType.ALL)

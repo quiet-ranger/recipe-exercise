@@ -36,12 +36,12 @@ public class IngredientController {
         this.unitOfMeasureService = unitOfMeasureService;
     }
 
-//    @GetMapping("/recipe/{recipeId}/ingredient")
-//    public String listIngredients(@PathVariable String recipeId, Model model) {
-//        log.info("listIngredients end point invoked");
-//        model.addAttribute("recipe", recipeService.findById(Long.valueOf(recipeId)));
-//        return "ingredient/list";
-//    }
+    @GetMapping("/recipe/{recipeId}/ingredient")
+    public String listIngredients(@PathVariable String recipeId, Model model) {
+        log.info("listIngredients end point invoked");
+        model.addAttribute("recipe", recipeService.findById(Long.valueOf(recipeId)));
+        return "ingredient/list";
+    }
 
     @GetMapping("/recipe/{recipeId}/ingredient/{ingredientId}/update")
     public String updateRecipeIngredientRequest(

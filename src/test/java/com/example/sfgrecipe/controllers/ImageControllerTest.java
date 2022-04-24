@@ -44,8 +44,7 @@ class ImageControllerTest {
        // when(ImageService).
         mockMvc.perform(multipart("/recipe/1/image").file(multipartFile))
                 .andExpect(status().isFound())
-//                .andExpect(status().isOk())
-//                .andExpect(header().string("Location", "/"))
+                .andExpect(header().string("Location", "/recipe/1"))
                 .andExpect(view().name("redirect:/recipe/1"))
                 ;
 

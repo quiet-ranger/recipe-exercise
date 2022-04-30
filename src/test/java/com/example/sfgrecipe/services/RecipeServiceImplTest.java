@@ -1,5 +1,6 @@
 package com.example.sfgrecipe.services;
 
+import com.example.sfgrecipe.exceptions.NotFoundException;
 import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,18 @@ class RecipeServiceImplTest {
         assertNotNull(recipeReturned, "Null recipe returned");
         verify(recipeRepository, times(1)).findById(anyLong());
         verify(recipeRepository, never()).findAll();
+    }
+
+    @Test
+    public void findByIdThrowsExceptionWithInvalidId() throws Exception {
+        Optional<Recipe> recipeResult = Optional.empty();
+        when(recipeRepository.findById(anyLong())).thenReturn(recipeResult);
+
+        Exception exception = assertThrows(
+                NotFoundException.class,
+                () -> recipeService.findById(1L)
+        );
+        // assertTrue(exception.getMessage().contains("not found"));
     }
 
     @Test

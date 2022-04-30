@@ -1,5 +1,6 @@
 package com.example.sfgrecipe.controllers;
 
+import com.example.sfgrecipe.exceptions.NotFoundException;
 import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.presentation.model.RecipeViewModel;
 import com.example.sfgrecipe.services.RecipeService;
@@ -32,7 +33,7 @@ class RecipeControllerTest {
     }
 
     @Test // GET /recipe/1
-    void getRecipeWorksWithValidId() throws Exception {
+    public void getRecipeWorksWithValidId() throws Exception {
         Recipe recipe = new Recipe();
         recipe.setId(1L);
 
@@ -43,6 +44,18 @@ class RecipeControllerTest {
                 .andExpect(view().name("recipe/show"))
                 .andExpect(model().attributeExists("recipe"))
                 ;
+    }
+
+    @Test
+    public void getRecipeWorksWithInvalidId() throws Exception {
+        Recipe recipe = new Recipe();
+        recipe.setId(1L);
+
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/recipe/1"))
+                .andExpect(status().isNotFound())
+        ;
     }
 
     @Test // GET /recipe/new

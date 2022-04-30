@@ -1,11 +1,13 @@
 package com.example.sfgrecipe.services;
 
+import com.example.sfgrecipe.exceptions.NotFoundException;
 import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.repositories.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -28,7 +30,11 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public Recipe findById(Long l) {
-        return recipeRepository.findById(l).orElse(null);
+        Optional<Recipe> recipeOptional = recipeRepository.findById(l);
+        if ( !recipeOptional.isPresent() ) {
+            throw new NotFoundException("Recipe not found.");
+        }
+        return recipeOptional.get();
     }
 
     @Override

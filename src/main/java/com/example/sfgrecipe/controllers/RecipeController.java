@@ -5,6 +5,7 @@ import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.presentation.model.RecipeViewModel;
 import com.example.sfgrecipe.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,10 +17,18 @@ import org.springframework.web.servlet.ModelAndView;
 @Slf4j
 public class RecipeController {
 
+    private boolean verboseEnabled = false;
+
     private final RecipeService recipeService;
 
-    public RecipeController(RecipeService recipeService) {
+    public RecipeController(RecipeService recipeService, Environment env) {
         this.recipeService = recipeService;
+
+        String[] profiles = env.getActiveProfiles();
+        for ( int i = 0; i < profiles.length; i++ ) {
+            verboseEnabled |= (profiles[i].equalsIgnoreCase("DEV") || profiles[i].equalsIgnoreCase("QA"));
+        }
+
     }
 
     @GetMapping("/recipe/{id}")
@@ -66,10 +75,24 @@ public class RecipeController {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ModelAndView handleNotFoundException() {
-        log.error("Handling NotFoundException");
+    public ModelAndView handleNotFoundException(Exception exception) {
+        NotFoundException nfe = (NotFoundException)exception;
+        log.error(String.format("Handling NotFoundException: %s %d", nfe.getMessage(), nfe.getId()));
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("404error");
+        modelAndView.addObject("exception", exception);
+        modelAndView.addObject( "verbose", verboseEnabled);
+        return modelAndView;
+    }
+
+    @ExceptionHandler(NumberFormatException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ModelAndView handleNumberFormatException(Exception exception) {
+        log.error("Conversion to number failed");
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("400error");
+        modelAndView.addObject("exception", exception);
+        modelAndView.addObject( "verbose", verboseEnabled);
         return modelAndView;
     }
 }

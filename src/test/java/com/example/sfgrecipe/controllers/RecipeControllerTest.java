@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -21,6 +22,9 @@ class RecipeControllerTest {
     @Mock
     RecipeService recipeService;
 
+    @Mock
+    Environment env;
+
     RecipeController controller;
 
     MockMvc mockMvc;
@@ -28,7 +32,7 @@ class RecipeControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new RecipeController(recipeService);
+        controller = new RecipeController(recipeService, env);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -47,13 +51,22 @@ class RecipeControllerTest {
     }
 
     @Test
-    public void getRecipeWorksWithInvalidId() throws Exception {
-
+    public void getRecipeWorksWithInvalidNumericId() throws Exception {
         when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
 
         mockMvc.perform(get("/recipe/1"))
                 .andExpect(status().isNotFound())
                 .andExpect(view().name("404error"))
+        ;
+    }
+
+    @Test
+    public void getRecipeWorksWithInvalidNonNumericId() throws Exception {
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/recipe/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("400error"))
         ;
     }
 

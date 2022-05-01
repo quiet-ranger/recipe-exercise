@@ -17,10 +17,21 @@
           crossorigin="anonymous" th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
 </head>
 <body>
+<!--/*@thymesVar id="exception" type="com.example.sfgrecipe.exceptions.NotFoundException"*/-->
+<!--/*@thymesVar id="ste" type="java.lang.StackTraceElement"*/-->
+<!--/*@thymesVar id="verbose" type="java.lang.Boolean"*/-->
 <div class="container-fluid" style="margin-top: 20px">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <h1>404 Not Found</h1>
+      <p th:text="'Message .: ' + ${exception.message}">Custom message</p>
+      <p th:text="'Input ...: ' + ${exception.id}">Custom message</p>
+      <p th:if="${verbose}">Lower environment debug mode</p>
+      <ol th:if="${verbose}" th:each="ste : ${exception.getStackTrace()}">
+        <li th:remove="all">first line</li>
+        <li th:remove="all">second line</li>
+        <li th:text="${ste.toString()}" style="list-style-type: none">third line</li>
+      </ol>
     </div>
   </div>
 </div>

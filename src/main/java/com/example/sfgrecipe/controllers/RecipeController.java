@@ -25,7 +25,7 @@ public class RecipeController {
         this.recipeService = recipeService;
 
         String[] profiles = env.getActiveProfiles();
-        for ( int i = 0; i < profiles.length; i++ ) {
+        for ( int i = 0; profiles != null && i < profiles.length; i++ ) {
             verboseEnabled |= (profiles[i].equalsIgnoreCase("DEV") || profiles[i].equalsIgnoreCase("QA"));
         }
 

@@ -26,7 +26,7 @@ class UnitOfMeasureRepositoryIT {
     }
 
     @Test
-    //@DirtiesContext
+    //@DirtiesContext context gets recreated before the next test
     void findTeaspoonByDescription() {
         Optional<UnitOfMeasure> uomOptional = unitOfMeasureRepository.findByDescription("Teaspoon");
         assertEquals("Teaspoon", uomOptional.get().getDescription());

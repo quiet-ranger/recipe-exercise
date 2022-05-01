@@ -5,6 +5,7 @@ import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.presentation.model.RecipeViewModel;
 import com.example.sfgrecipe.services.RecipeService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -61,11 +62,23 @@ class RecipeControllerTest {
     }
 
     @Test
-    public void getRecipeWorksWithInvalidNonNumericId() throws Exception {
-        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
-
+    public void getRecipeWorksWithInvalidNonNumericIdInProd() throws Exception {
+//        when(env.getActiveProfiles()).thenReturn(new String[]{"prod"});
         mockMvc.perform(get("/recipe/abc"))
                 .andExpect(status().isBadRequest())
+                .andExpect(model().attributeExists("verbose"))
+                .andExpect(model().attribute("verbose", false))
+                .andExpect(view().name("400error"))
+        ;
+    }
+
+    @Disabled // Profile aware test not possible this way
+    public void getRecipeWorksWithInvalidNonNumericIdInLowerEnvironment() throws Exception {
+//        when(env.getActiveProfiles()).thenReturn(new String[]{"dev","qa"});
+        mockMvc.perform(get("/recipe/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(model().attributeExists("verbose"))
+                .andExpect(model().attribute("verbose", true))
                 .andExpect(view().name("400error"))
         ;
     }
@@ -87,8 +100,6 @@ class RecipeControllerTest {
 
         mockMvc.perform(post("/recipe")
                   .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-//                  .param("id", "")
-//                  .param("description", "some string")
             )
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name("redirect:/recipe/2"));

@@ -1,12 +1,15 @@
 package com.example.sfgrecipe.controllers;
 
+import com.example.sfgrecipe.exceptions.NotFoundException;
 import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.presentation.model.RecipeViewModel;
 import com.example.sfgrecipe.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
@@ -59,5 +62,14 @@ public class RecipeController {
     @GetMapping("recipe/{id}/delete")
     public String deleteRecipeFromForm(@PathVariable String id, Model model) {
         return this.deleteRecipe(id, model);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ModelAndView handleNotFoundException() {
+        log.error("Handling NotFoundException");
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("404error");
+        return modelAndView;
     }
 }

@@ -28,7 +28,7 @@ public class ImageController {
         this.recipeService = recipeService;
     }
 
-    @GetMapping("/recipe/{recipeId}/image")
+    @GetMapping("/recipe/{recipeId}/image/edit")
     public String handleImageUpdateRequest(@PathVariable String recipeId, Model model) {
         RecipeViewModel recipeViewModel = new RecipeViewModel();
         // Note that the form only needs the recipe id
@@ -37,13 +37,13 @@ public class ImageController {
         return "recipe/ImageUploadForm";
     }
 
-    @PostMapping("recipe/{recipeId}/image")
+    @PostMapping("/recipe/{recipeId}/image/edit")
     public String handleImagePost(@PathVariable String recipeId, @RequestParam("imagefile") MultipartFile file) {
         imageService.saveImageFile(Long.valueOf(recipeId), file);
         return String.format( "redirect:/recipe/%s", recipeId);
     }
 
-    @GetMapping("recipe/{recipeId}/recipeimage")
+    @GetMapping("/recipe/{recipeId}/image")
     public void handleRetrieveImage(@PathVariable String recipeId, HttpServletResponse response) throws Exception {
         Recipe recipe = recipeService.findById(Long.valueOf(recipeId));
 

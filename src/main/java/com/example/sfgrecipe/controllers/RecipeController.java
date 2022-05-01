@@ -17,18 +17,13 @@ import org.springframework.web.servlet.ModelAndView;
 @Slf4j
 public class RecipeController {
 
-    private boolean verboseEnabled = false;
+    private ProfileHelper profileHelper;
 
     private final RecipeService recipeService;
 
-    public RecipeController(RecipeService recipeService, Environment env) {
+    public RecipeController(RecipeService recipeService, ProfileHelper profileHelper) {
         this.recipeService = recipeService;
-
-        String[] profiles = env.getActiveProfiles();
-        for ( int i = 0; profiles != null && i < profiles.length; i++ ) {
-            verboseEnabled |= (profiles[i].equalsIgnoreCase("DEV") || profiles[i].equalsIgnoreCase("QA"));
-        }
-
+        this.profileHelper = profileHelper;
     }
 
     @GetMapping("/recipe/{id}")
@@ -81,18 +76,8 @@ public class RecipeController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("404error");
         modelAndView.addObject("exception", exception);
-        modelAndView.addObject( "verbose", verboseEnabled);
+        modelAndView.addObject( "verbose", !profileHelper.isThisProduction());
         return modelAndView;
     }
 
-    @ExceptionHandler(NumberFormatException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ModelAndView handleNumberFormatException(Exception exception) {
-        log.error("Conversion to number failed");
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("400error");
-        modelAndView.addObject("exception", exception);
-        modelAndView.addObject( "verbose", verboseEnabled);
-        return modelAndView;
-    }
 }

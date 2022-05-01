@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -24,7 +23,7 @@ class RecipeControllerTest {
     RecipeService recipeService;
 
     @Mock
-    Environment env;
+    ProfileHelper profileHelper;
 
     RecipeController controller;
 
@@ -33,8 +32,10 @@ class RecipeControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new RecipeController(recipeService, env);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        controller = new RecipeController(recipeService, profileHelper);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new ControllerExceptionHandler(new ProfileHelper(null)))
+                .build();
     }
 
     @Test // GET /recipe/1
@@ -61,7 +62,7 @@ class RecipeControllerTest {
         ;
     }
 
-    @Test
+    @Test // Without a real context, the system behaves like in prod by default
     public void getRecipeWorksWithInvalidNonNumericIdInProd() throws Exception {
 //        when(env.getActiveProfiles()).thenReturn(new String[]{"prod"});
         mockMvc.perform(get("/recipe/abc"))
@@ -72,9 +73,8 @@ class RecipeControllerTest {
         ;
     }
 
-    @Disabled // Profile aware test not possible this way
+    @Disabled  // Profile aware test not possible this way
     public void getRecipeWorksWithInvalidNonNumericIdInLowerEnvironment() throws Exception {
-//        when(env.getActiveProfiles()).thenReturn(new String[]{"dev","qa"});
         mockMvc.perform(get("/recipe/abc"))
                 .andExpect(status().isBadRequest())
                 .andExpect(model().attributeExists("verbose"))

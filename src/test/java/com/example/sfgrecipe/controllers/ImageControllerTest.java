@@ -36,7 +36,9 @@ class ImageControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         controller = new ImageController(imageService, recipeService);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new ControllerExceptionHandler(new ProfileHelper(null)))
+                .build();
     }
 
     @Test
@@ -49,7 +51,7 @@ class ImageControllerTest {
         );
 
        // when(ImageService).
-        mockMvc.perform(multipart("/recipe/1/image").file(multipartFile))
+        mockMvc.perform(multipart("/recipe/1/image/edit").file(multipartFile))
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", "/recipe/1"))
                 .andExpect(view().name("redirect:/recipe/1"))
@@ -74,7 +76,7 @@ class ImageControllerTest {
 
         when(recipeService.findById(anyLong())).thenReturn(recipe);
 
-        MockHttpServletResponse response = mockMvc.perform(get("/recipe/1/recipeimage"))
+        MockHttpServletResponse response = mockMvc.perform(get("/recipe/1/image"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse()
                 ;
@@ -82,4 +84,16 @@ class ImageControllerTest {
 
         assertEquals(s.getBytes(StandardCharsets.UTF_8).length, responseBytes.length);
     }
+
+    @Test
+    public void getRecipeImageWorksWithInvalidNonNumericIdInProd() throws Exception {
+        mockMvc.perform(get("/recipe/abc/image"))
+                .andExpect(status().isBadRequest())
+                .andExpect(model().attributeExists("verbose"))
+                .andExpect(model().attribute("verbose", false))
+                .andExpect(view().name("400error"))
+        ;
+    }
+
+
 }

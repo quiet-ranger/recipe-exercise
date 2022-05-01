@@ -5,12 +5,14 @@ import com.example.sfgrecipe.model.Recipe;
 import com.example.sfgrecipe.presentation.model.RecipeViewModel;
 import com.example.sfgrecipe.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.validation.Valid;
 
 
 @Controller
@@ -46,7 +48,13 @@ public class RecipeController {
     }
 
     @PostMapping("recipe")
-    public String saveOrUpdate(@ModelAttribute RecipeViewModel command) {
+    public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeViewModel command, BindingResult result) {
+
+        if (result.hasErrors()) {
+            result.getAllErrors().forEach( error -> { log.debug(error.toString()); } );
+            return "recipe/recipeform";
+        }
+
         Recipe savedRecipe = recipeService.upsert(RecipeViewModel.toRecipe(command));
         if (savedRecipe == null) {
             log.error("Failed to update or create new recipe");
